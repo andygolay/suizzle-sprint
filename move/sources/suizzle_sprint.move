@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 module suizzle_sprint::suizzle_sprint {
-    use sui::object::{Self, ID, UID};
+    use sui::object::{Self, UID};
     use sui::transfer::transfer;
     use sui::tx_context::{Self, TxContext};
     use sui::clock::{Self, Clock};
 
-    struct SprintGame has key {
+    struct SprintGame has key, store {
         id: UID,
         player: address,
         start_time: u64,
@@ -25,13 +25,13 @@ module suizzle_sprint::suizzle_sprint {
             id,
             player,
             start_time,
-            end_time = 0,
-            duration = 0
+            end_time: 0,
+            duration: 0
         };
         transfer(game, player);
     }
 
-    public entry fun end_game(clock: &Clock, game: &mut SprintGame) {
+    public entry fun end_game(clock: &Clock, game: &mut SprintGame, ctx: &mut TxContext) {
 
         let end_time = clock::timestamp_ms(clock);
         game.end_time = end_time;
