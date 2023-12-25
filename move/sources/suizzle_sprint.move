@@ -3,7 +3,7 @@
 
 module suizzle_sprint::suizzle_sprint {
     use sui::object::{Self, ID, UID};
-    use sui::transfer;
+    use sui::transfer::transfer;
     use sui::tx_context::{Self, TxContext};
     use sui::clock::{Self, Clock};
 
@@ -12,7 +12,7 @@ module suizzle_sprint::suizzle_sprint {
         player: address,
         start_time: u64,
         end_time: u64,
-        duration: u64 
+        duration: u64
     }
 
     public entry fun create_game(clock: &Clock, ctx: &mut TxContext) {
@@ -25,13 +25,13 @@ module suizzle_sprint::suizzle_sprint {
             id,
             player,
             start_time,
-            end_time: 0,
-            duration: 0,
+            end_time = 0,
+            duration = 0
         };
-        transfer::share_object(game);
+        transfer(game, player);
     }
 
-    public entry fun end_game(clock: &Clock, game: &mut SprintGame, ctx: &mut TxContext) {
+    public entry fun end_game(clock: &Clock, game: &mut SprintGame) {
 
         let end_time = clock::timestamp_ms(clock);
         game.end_time = end_time;
