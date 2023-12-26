@@ -20,9 +20,14 @@ const Home: NextPage = () => {
 
       <div className="max-w-7xl mx-auto text-center py-12 px-4 sm:px-6 lg:py-16 lg:px-8 flex-6">
         {!wallet ? (
-          <SignInButton className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
-            Connect
-          </SignInButton>
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl m-2">
+              Welcome! Connect to play!
+            </h1>
+            <SignInButton className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 m-2">
+              Connect
+            </SignInButton>
+          </div>
         ) : (
           <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-2">
