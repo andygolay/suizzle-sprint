@@ -1,69 +1,94 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Square from "../components/Square";
+import { SPRINT_GAME_CONTRACT } from '../lib/constants';
+import { ethos, TransactionBlock } from 'ethos-connect'
+import { SuiCallArg, SuiObjectChange } from "@mysten/sui.js/dist/cjs/client";
 type Player = "X" | "O" | "BOTH" | null;
 
-function calculateWinner(squares: Player[]) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
-    }
-  }
-  return null;
-}
 
 function Board() {
+  const { wallet } = ethos.useWallet();
   const [squares, setSquares] = useState(Array(9).fill(null));
-  const [currentPlayer, setCurrentPlayer] = useState<"X" | "O">(
-    Math.round(Math.random() * 1) === 1 ? "X" : "O"
-  );
-  const [winner, setWinner] = useState<Player>(null);
+  const [game_status, setStatus] = useState< 0 | 1 >(0);
+  let curr_game = "none_yet";
 
-  function reset() {
-    setSquares(Array(9).fill(null));
-    setWinner(null);
-    setCurrentPlayer(Math.round(Math.random() * 1) === 1 ? "X" : "O");
-  }
+  const start = useCallback(async () => {
+    if (!wallet) return;
 
-  function setSquareValue(index: number) {
-    const newData = squares.map((val, i) => {
-      if (i === index) {
-        return currentPlayer;
-      }
-      return val;
-    });
-    setSquares(newData);
-    setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
-  }
+    try {
+      const startTx = new TransactionBlock();
+      const createdGame = startTx.moveCall({
+        target: `${SPRINT_GAME_CONTRACT}::suizzle_sprint::create_game`,
+        arguments: [
+          startTx.pure("0x6"),        
+        ]
+      })
+
+      const response = await wallet.signAndExecuteTransactionBlock({
+        transactionBlock: startTx,
+        options: {
+          showObjectChanges: true,
+        }
+      });
+      
+      if (response.objectChanges) {
+        const createObjectChange = response.objectChanges.find(
+            (objectChange) => objectChange.type === "created"
+        );
+        if (!!createObjectChange && "objectId" in createObjectChange) {
+          curr_game = createObjectChange.objectId;
+        }
+      }  
+      setStatus(1);
+    } catch (error) {
+      console.log(error);
+    }
+    return curr_game;
+  }, [wallet]);
+
+
+  const end = useCallback(async () => {
+    if (!wallet) return;
+
+    try {
+      const startTx = new TransactionBlock();
+      const endedGame = startTx.moveCall({
+        target: `${SPRINT_GAME_CONTRACT}::suizzle_sprint::end_game`,
+        arguments: [
+          startTx.pure("0x6"),  
+          startTx.pure(game_address)      
+        ]
+      })
+
+      const response = await wallet.signAndExecuteTransactionBlock({
+        transactionBlock: startTx,
+        options: {
+          showObjectChanges: true,
+        }
+      });
+      
+      if (response.objectChanges) {
+        const createObjectChange = response.objectChanges.find(
+            (objectChange) => objectChange.type === "created"
+        );
+
+      } 
+      console.log(response);
+      setStatus(1);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [wallet]);
 
   useEffect(() => {
-    const w = calculateWinner(squares);
-    if (w) {
-      setWinner(w);
-    }
-
-    if (!w && !squares.filter((square) => !square).length) {
-      setWinner("BOTH");
-    }
+      
+    
   });
 
   return (
     <div>
-      {!winner && <p>Hey {currentPlayer}, it's your turn</p>}
-      {winner && winner !== "BOTH" && <p>Congratulations {winner}</p>}
-      {winner && winner === "BOTH" && (
-        <p>Congratulations you're both winners</p>
-      )}
+      {game_status == 0 && <p></p>}
+      {game_status == 1 && <p>Go!</p>}
 
       <div className="grid">
         {Array(9)
@@ -71,16 +96,15 @@ function Board() {
           .map((_, i) => {
             return (
               <Square
-                winner={winner}
                 key={i}
-                onClick={() => setSquareValue(i)}
+                onClick={end} 
                 value={squares[i]}
               />
             );
           })}
       </div>
-      <button className="reset" onClick={reset}>
-        RESET
+      <button className="start" onClick={start}>
+        Start
       </button>
     </div>
   );

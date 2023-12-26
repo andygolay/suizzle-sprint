@@ -3,15 +3,13 @@ type Player = "X" | "O" | "BOTH" | null;
 function Square({
   value,
   onClick,
-  winner,
 }: {
-  winner: Player;
   value: Player;
   onClick: () => void;
 }) {
   if (!value) {
     return (
-      <button className="square" onClick={onClick} disabled={Boolean(winner)} />
+      <button className="square" onClick={onClick} disabled={false} />
     );
   }
   return (
