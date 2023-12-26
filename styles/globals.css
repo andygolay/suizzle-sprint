@@ -54,9 +54,19 @@ a {
 }
 
 .start {
-  margin-top: 2rem;
+  margin: 2rem;
   font-size: 2rem;
-  background-color: aqua;
+  background-color: rgb(103, 214, 214);
+  border: none;
+  border-radius: 6px;
+  padding: 1rem;
+  cursor: pointer;
+}
+
+.end {
+  margin: 2rem;
+  font-size: 2rem;
+  background-color: rgb(103, 214, 214);
   border: none;
   border-radius: 6px;
   padding: 1rem;

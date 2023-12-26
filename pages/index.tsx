@@ -12,7 +12,7 @@ const Home: NextPage = () => {
     <div className="flex justify-between items-start styles.container">
 
       <Head>
-        <title>Sui Tac Toe 🌊</title>
+        <title>Suizzle Sprint 🌊</title>
         <meta name="description" content="By Suizzle" />
         <link rel="icon" href="/suitactoe.png" />
       </Head>
@@ -25,30 +25,25 @@ const Home: NextPage = () => {
           </SignInButton>
         ) : (
           <div className="flex flex-col gap-6">
-
-              <main className={styles.main}>
+              <div className="flex flex-col gap-2">
+              <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+                Suizzle Sprint
+              </h1>
+            </div>
+              <main className={styles.main}>  
                 <Board />
               </main>
 
             <div className="flex flex-col gap-2">
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Connected to wallet
+                Leaderboard goes here?
               </h2>
               <code>{wallet.address}</code>
-              <div className="place-content-center text-base font-medium text-ethos-primary space-x-1">
-                <div>
-                  Wallet balance: <code>{wallet.contents?.suiBalance.toString()}</code>{" "}
-                  Mist
-                </div>
-                <div className="text-xs text-gray-500">
-                  (1 sui is 10^9 Mist)
-                </div>
-              </div>
             </div>
             <div className="flex flex-col gap-4">
               Thanks for playing. You can 
               <Mint />
-              or play more Sui Tac Toe ☝️ or
+              or play more Suzzle Sprint ☝️ or
               <Disconnect />
             </div>
           </div>

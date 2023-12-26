@@ -51,17 +51,17 @@ function Board() {
     if (!wallet) return;
 
     try {
-      const startTx = new TransactionBlock();
-      const endedGame = startTx.moveCall({
+      const endTx = new TransactionBlock();
+      const endedGame = endTx.moveCall({
         target: `${SPRINT_GAME_CONTRACT}::suizzle_sprint::end_game`,
         arguments: [
-          startTx.pure("0x6"),  
-          startTx.pure(game_address)      
+          endTx.pure("0x6"),  
+          endTx.pure(curr_game)      
         ]
       })
 
       const response = await wallet.signAndExecuteTransactionBlock({
-        transactionBlock: startTx,
+        transactionBlock: endTx,
         options: {
           showObjectChanges: true,
         }
@@ -87,24 +87,14 @@ function Board() {
 
   return (
     <div>
-      {game_status == 0 && <p></p>}
-      {game_status == 1 && <p>Go!</p>}
+      {game_status == 0 && <p>Start the game now!</p>}
+      {game_status == 1 && <p>End the game fast!</p>}
 
-      <div className="grid">
-        {Array(9)
-          .fill(null)
-          .map((_, i) => {
-            return (
-              <Square
-                key={i}
-                onClick={end} 
-                value={squares[i]}
-              />
-            );
-          })}
-      </div>
       <button className="start" onClick={start}>
         Start
+      </button>
+      <button className="end" onClick={end}>
+        End
       </button>
     </div>
   );
