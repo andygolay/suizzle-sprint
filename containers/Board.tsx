@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import Square from "../components/Square";
+import SuccessMessage from "../components/SuccessMessage";
 import { SPRINT_GAME_CONTRACT } from '../lib/constants';
 import { ethos, TransactionBlock } from 'ethos-connect'
 import { SuiCallArg, SuiObjectChange } from "@mysten/sui.js/dist/cjs/client";
@@ -10,7 +11,11 @@ function Board() {
   const { wallet } = ethos.useWallet();
   const [squares, setSquares] = useState(Array(9).fill(null));
   const [game_status, setStatus] = useState< 0 | 1 >(0);
-  let curr_game = "none_yet";
+  let curr_game = "notyet";
+
+  const reset = useCallback(() => {
+
+}, [])
 
   const start = useCallback(async () => {
     if (!wallet) return;
@@ -43,7 +48,7 @@ function Board() {
     } catch (error) {
       console.log(error);
     }
-    return curr_game;
+
   }, [wallet]);
 
 
@@ -87,6 +92,18 @@ function Board() {
 
   return (
     <div>
+            {curr_game != "notyet" && (
+              <SuccessMessage reset={reset}>
+                <a 
+                  href={`https://explorer.sui.io/objects/${curr_game}?network=mainnet`}
+                  target="_blank" 
+                  rel="noreferrer"
+                  className='underline font-blue-600' 
+                >
+                  View Your Game on Sui Explorer 
+                </a>
+              </SuccessMessage>
+            )}
       {game_status == 0 && <p>Start the game now!</p>}
       {game_status == 1 && <p>End the game fast!</p>}
 
