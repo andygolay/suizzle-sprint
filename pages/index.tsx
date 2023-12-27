@@ -46,9 +46,7 @@ const Home: NextPage = () => {
               <code>{wallet.address}</code>
             </div>
             <div className="flex flex-col gap-4">
-              Thanks for playing. You can 
-              <Mint />
-              or play more Suzzle Sprint ☝️ or
+              Thanks for playing. You can play more Suzzle Sprint ☝️ or
               <Disconnect />
             </div>
           </div>
