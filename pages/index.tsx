@@ -18,9 +18,9 @@ const Home: NextPage = () => {
       </Head>
       <div className="p-12 flex-1">Status: {status}</div>
 
-      <div className="z-10 max-w-7xl mx-auto text-center py-12 px-4 sm:px-6 lg:py-16 lg:px-8 flex-6">
+      <div className="h-full z-10 max-w-7xl mx-auto text-center py-12 px-4 sm:px-6 lg:py-16 lg:px-8 flex-6">
         {!wallet ? (
-          <div>
+          <div className="h-full">
             <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl m-2">
               Welcome! Connect to play!
             </h1>
@@ -52,7 +52,7 @@ const Home: NextPage = () => {
         )}
       </div>
 
-      <div id="address-widget" className="p-12 flex-1 flex justify-end">
+      <div id="address-widget" className="p-12 flex-1 flex justify-end z-10">
         <ethos.components.AddressWidget 
           // excludeButtons={[
           //   ethos.enums.AddressWidgetButtons.WalletExplorer

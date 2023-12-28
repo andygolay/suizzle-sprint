@@ -73,8 +73,6 @@ p {
 }
 body{
   overflow: hidden;
-  background: url("/../bg0.jpg");
-  background-size: cover;
 }
 .stars{
   position: absolute;
@@ -83,8 +81,9 @@ body{
   width: 100%;
   height: 100vh;
   background-position-x: center;
-  background-size: cover;
   animation: animateBg 50s linear infinite;
+  background: url("/../bg0.jpg");
+  background-size: cover;
 
 }
 @keyframes animateBg {
