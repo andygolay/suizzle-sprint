@@ -11,18 +11,18 @@ function MyApp({ Component, pageProps }: AppProps) {
     apiKey: process.env.NEXT_PUBLIC_ETHOS_API_KEY,
     preferredWallets: ['Ethos Wallet'],
     network: NETWORK,
-    chain: Chain.SUI_TESTNET
+    chain: Chain.SUI_MAINNET
   };
 
   return (
     <EthosConnectProvider
       ethosConfiguration={ethosConfiguration}
-      dappName="EthosConnect Example App"
+      dappName="Suizzle Sprint"
       dappIcon={<ExampleIcon />}
-      connectMessage="Your connect message goes here!"
+      connectMessage="May the fastest wallet win!"
     >
       <Head>
-        <title>Ethos Connect Example App</title>
+        <title>Suizzle Sprint</title>
       </Head>
       <Component {...pageProps} />
     </EthosConnectProvider>
