@@ -1,11 +1,13 @@
 // Copyright (c) Andy Golay
 // SPDX-License-Identifier: Apache-2.0
 
-module suizzle_sprint::suizzle_sprint {
+module suizzle_sprint::game {
     use sui::object::{Self, UID};
     use sui::transfer::transfer;
     use sui::tx_context::{Self, TxContext};
     use sui::clock::{Self, Clock};
+
+    friend suizzle_sprint::leaderboard;   
 
     struct SprintGame has key, store {
         id: UID,
@@ -26,7 +28,7 @@ module suizzle_sprint::suizzle_sprint {
             player,
             start_time,
             end_time: 0,
-            duration: 0
+            duration: 1000000
         };
         transfer(game, player);
     }

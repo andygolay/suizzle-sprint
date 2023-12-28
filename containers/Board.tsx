@@ -1,16 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
-import Square from "../components/Square";
 import SuccessMessage from "../components/SuccessMessage";
-import { SPRINT_GAME_CONTRACT } from '../lib/constants';
+import { SPRINT_GAME_CONTRACT, LEADERBOARD_CONTRACT } from '../lib/constants';
 import { ethos, TransactionBlock } from 'ethos-connect'
-import { SuiCallArg, SuiObjectChange } from "@mysten/sui.js/dist/cjs/client";
-type Player = "X" | "O" | "BOTH" | null;
-
 
 function Board() {
   const { wallet } = ethos.useWallet();
-  const [squares, setSquares] = useState(Array(9).fill(null));
-  const [game_status, setStatus] = useState< 0 | 1 >(0);
+  const [game_status, setStatus] = useState< 0 | 1 | 2>(0);
   let curr_game = "notyet";
 
   const reset = useCallback(() => {
@@ -76,10 +71,42 @@ function Board() {
         const createObjectChange = response.objectChanges.find(
             (objectChange) => objectChange.type === "created"
         );
-
+        {/* setStatus(2);
+        await submit(); */}
+        setStatus(0);
       } 
       console.log(response);
-      setStatus(1);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [wallet]);
+
+  const submit = useCallback(async () => {
+    if (!wallet) return;
+
+    try {
+      const submitTx = new TransactionBlock();
+      const submittedGame = submitTx.moveCall({
+        target: `${SPRINT_GAME_CONTRACT}::leaderboard::submit_game`,
+        arguments: [
+          submitTx.pure(curr_game),  
+          submitTx.pure(LEADERBOARD_CONTRACT)      
+        ]
+      })
+
+      const response = await wallet.signAndExecuteTransactionBlock({
+        transactionBlock: submitTx,
+        options: {
+          showObjectChanges: true,
+        }
+      });
+      
+      if (response.objectChanges) {
+        const createObjectChange = response.objectChanges.find(
+            (objectChange) => objectChange.type === "created"
+        );
+      } 
+      console.log(response);
     } catch (error) {
       console.log(error);
     }
@@ -92,21 +119,21 @@ function Board() {
 
   return (
     <div>
-            {curr_game != "notyet" && (
-              <SuccessMessage reset={reset}>
-                <a 
-                  href={`https://explorer.sui.io/objects/${curr_game}?network=mainnet`}
-                  target="_blank" 
-                  rel="noreferrer"
-                  className='underline font-blue-600' 
-                >
-                  View Your Game on Sui Explorer 
-                </a>
-              </SuccessMessage>
-            )}
+      {curr_game != "notyet" && (
+        <SuccessMessage reset={reset}>
+          <a 
+            href={`https://explorer.sui.io/objects/${curr_game}?network=mainnet`}
+            target="_blank" 
+            rel="noreferrer"
+            className='underline font-blue-600' 
+          >
+            View Your Game on Sui Explorer 
+          </a>
+        </SuccessMessage>
+      )}
       {game_status == 0 && <p>Start the game now!</p>}
       {game_status == 1 && <p>End the game fast!</p>}
-
+      {/* {game_status == 1 && <p>Submit game to leaderboard?</p>}*/}
       <button className="start" onClick={start}>
         Start
       </button>

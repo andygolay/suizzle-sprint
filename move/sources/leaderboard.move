@@ -8,22 +8,20 @@ module suizzle_sprint::leaderboard {
     use suizzle_sprint::suizzle_sprint::{Self, SprintGame};
 
     const ENotALeader: u64 = 0;
-    const ELowTile: u64 = 1;
-    const ELowScore: u64 = 2;
+    const EOffTheCharts: u64 = 1;
 
     struct Leaderboard has key, store {
         id: UID,
         max_leaderboard_game_count: u64,
-        top_games: vector<TopGame8192>,
-        min_tile: u64,
-        min_score: u64
+        top_games: vector<TopSprintGame>,
+        max_duration: u64,
     }
 
-    struct TopGame8192 has store, copy, drop {
+    struct TopSprintGame has store, copy, drop {
         game_id: ID,
         leader_address: address,
-        top_tile: u64,
-        score: u64
+        start_time: u64,
+        duration: u64
     }
 
     fun init(ctx: &mut TxContext) {
@@ -33,32 +31,31 @@ module suizzle_sprint::leaderboard {
     // ENTRY FUNCTIONS //
 
     public entry fun create(ctx: &mut TxContext) {
-        let leaderboard = Leaderboard8192 {
+        let leaderboard = SprintLeaderboard {
             id: object::new(ctx),
             max_leaderboard_game_count: 50,
-            top_games: vector<TopGame8192>[],
-            min_tile: 0,
-            min_score: 0
+            top_games: vector<TopSprintGame>[],
+            max_duration: 1000000,
         };
 
         transfer::share_object(leaderboard);
     }
 
-    public entry fun submit_game(game: &mut Game8192, leaderboard: &mut Leaderboard8192) {
-        let top_tile = *game_8192::top_tile(game);
-        let score = *game_8192::score(game);
+    public entry fun submit_game(game: &mut SprintGame, leaderboard: &mut SprintLeaderboard) {
 
-        assert!(top_tile >= leaderboard.min_tile, ELowTile);
-        assert!(score > leaderboard.min_score, ELowScore);
+        let duration = *suizzle_sprint::duration(game);
 
-        let leader_address = *game_8192::player(game);
-        let game_id = game_8192::id(game);
+        assert!(duration <= leaderboard.max_duration, EOffTheCharts);
 
-        let top_game = TopGame8192 {
+        let leader_address = *suizzle_sprint::player(game);
+        let game_id = suizzle_sprint::id(game);
+
+        let top_game = TopSprintGame {
             game_id,
             leader_address,
-            score: *game_8192::score(game),
-            top_tile: *game_8192::top_tile(game)
+            start_time: *suizzle_sprint::start_time(game),
+            duration: *suizzle_sprint::duration(game),
+
         };
 
         add_top_game_sorted(leaderboard, top_game);
@@ -66,44 +63,40 @@ module suizzle_sprint::leaderboard {
 
     // PUBLIC ACCESSOR FUNCTIONS //
 
-    public fun game_count(leaderboard: &Leaderboard8192): u64 {
+    public fun game_count(leaderboard: &SprintLeaderboard): u64 {
         vector::length(&leaderboard.top_games)
     }
 
-    public fun top_games(leaderboard: &Leaderboard8192): &vector<TopGame8192> {
+    public fun top_games(leaderboard: &SprintLeaderboard): &vector<TopSprintGame> {
         &leaderboard.top_games
     }
 
-    public fun top_game_at(leaderboard: &Leaderboard8192, index: u64): &TopGame8192 {
+    public fun top_game_at(leaderboard: &SprintLeaderboard, index: u64): &TopSprintGame {
         vector::borrow(&leaderboard.top_games, index)
     }
 
-    public fun top_game_at_has_id(leaderboard: &Leaderboard8192, index: u64, game_id: ID): bool {
+    public fun top_game_at_has_id(leaderboard: &SprintLeaderboard, index: u64, game_id: ID): bool {
         let top_game = top_game_at(leaderboard, index);
         top_game.game_id == game_id
     }
 
-    public fun top_game_game_id(top_game: &TopGame8192): ID {
+    public fun top_game_game_id(top_game: &TopSprintGame): ID {
         top_game.game_id
     }
 
-    public fun top_game_top_tile(top_game: &TopGame8192): &u64 {
+    public fun top_game_top_tile(top_game: &TopSprintGame): &u64 {
         &top_game.top_tile
     }
 
-    public fun top_game_score(top_game: &TopGame8192): &u64 {
+    public fun top_game_score(top_game: &TopSprintGame): &u64 {
         &top_game.score
     }
 
-    public fun min_tile(leaderboard: &Leaderboard8192): &u64 {
-        &leaderboard.min_tile
+    public fun max_duration(leaderboard: &SprintLeaderboard): &u64 {
+        &leaderboard.max_duration
     }
 
-    public fun min_score(leaderboard: &Leaderboard8192): &u64 {
-        &leaderboard.min_score
-    }
-
-    fun add_top_game_sorted(leaderboard: &mut Leaderboard8192, top_game: TopGame8192) {
+    fun add_top_game_sorted(leaderboard: &mut SprintLeaderboard, top_game: TopSprintGame) {
         let top_games = leaderboard.top_games;
         let top_games_length = vector::length(&top_games);
 
@@ -128,15 +121,14 @@ module suizzle_sprint::leaderboard {
         };
 
         if (top_games_length >= leaderboard.max_leaderboard_game_count) {
-            let bottom_game = vector::borrow(&top_games, top_games_length - 1);
-            leaderboard.min_tile = bottom_game.top_tile;
-            leaderboard.min_score = bottom_game.score;
+            let slowest_game = vector::borrow(&top_games, top_games_length - 1);
+            leaderboard.max_duration = slowest_game.duration;
         };
 
         leaderboard.top_games = top_games;
     }
 
-    public(friend) fun merge_sort_top_games(top_games: vector<TopGame8192>): vector<TopGame8192> {
+    public(friend) fun merge_sort_top_games(top_games: vector<TopSprintGame>): vector<TopSprintGame> {
         let top_games_length = vector::length(&top_games);
         if (top_games_length == 1) {
             return top_games
@@ -144,7 +136,7 @@ module suizzle_sprint::leaderboard {
 
         let mid = top_games_length / 2;
 
-        let right = vector<TopGame8192>[];
+        let right = vector<TopSprintGame>[];
         let index = 0;
         while (index < mid) {
             vector::push_back(&mut right, vector::pop_back(&mut top_games));
@@ -156,11 +148,11 @@ module suizzle_sprint::leaderboard {
         merge(sorted_left, sorted_right)
     }
 
-    public(friend) fun merge(left: vector<TopGame8192>, right: vector<TopGame8192>): vector<TopGame8192> {
+    public(friend) fun merge(left: vector<TopSprintGame>, right: vector<TopSprintGame>): vector<TopSprintGame> {
         vector::reverse(&mut left);
         vector::reverse(&mut right);
 
-        let result = vector<TopGame8192>[];
+        let result = vector<TopSprintGame>[];
         while (!vector::is_empty(&left) && !vector::is_empty(&right)) {
             let left_item = vector::borrow(&left, vector::length(&left) - 1);
             let right_item = vector::borrow(&right, vector::length(&right) - 1);
