@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import { SignInButton, ethos } from "ethos-connect";
-import { Disconnect, Fund, Mint, WalletActions } from "../components";
+import { Disconnect, Mint, WalletActions } from "../components";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import Board from "../containers/Board";
