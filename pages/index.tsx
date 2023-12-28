@@ -18,7 +18,7 @@ const Home: NextPage = () => {
       </Head>
       <div className="p-12 flex-1">Status: {status}</div>
 
-      <div className="max-w-7xl mx-auto text-center py-12 px-4 sm:px-6 lg:py-16 lg:px-8 flex-6">
+      <div className="z-10 max-w-7xl mx-auto text-center py-12 px-4 sm:px-6 lg:py-16 lg:px-8 flex-6">
         {!wallet ? (
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl m-2">
@@ -59,6 +59,20 @@ const Home: NextPage = () => {
           // ]} 
         />
       </div>
+      
+      <div className="stars">
+        <span className="starspan"></span>
+        <span className="starspan"></span>
+        <span className="starspan"></span>
+        <span className="starspan"></span>
+        <span className="starspan"></span>
+        <span className="starspan"></span>
+        <span className="starspan"></span>
+        <span className="starspan"></span>
+        <span className="starspan"></span>
+        <span className="starspan"></span>
+      </div>
+        
     </div>
   );
 };
