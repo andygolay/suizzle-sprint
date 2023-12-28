@@ -41,9 +41,8 @@ const Home: NextPage = () => {
 
             <div className="flex flex-col gap-2">
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Leaderboard goes here?
+                
               </h2>
-              <code>{wallet.address}</code>
             </div>
             <div className="flex flex-col gap-4">
               Thanks for playing. You can play more Suzzle Sprint ☝️ or

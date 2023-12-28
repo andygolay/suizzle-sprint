@@ -6,10 +6,10 @@ import { ethos, TransactionBlock } from 'ethos-connect'
 function Board() {
   const { wallet } = ethos.useWallet();
   const [game_status, setStatus] = useState< 0 | 1 | 2>(0);
-  let curr_game = "notyet";
+  const [curr_game, setCurrGame] = useState("");
 
   const reset = useCallback(() => {
-
+    setCurrGame("");
 }, [])
 
   const start = useCallback(async () => {
@@ -36,13 +36,15 @@ function Board() {
             (objectChange) => objectChange.type === "created"
         );
         if (!!createObjectChange && "objectId" in createObjectChange) {
-          curr_game = createObjectChange.objectId;
+          setCurrGame(createObjectChange.objectId);
         }
       }  
+      console.log(`Game started! ${curr_game}`);
       setStatus(1);
     } catch (error) {
       console.log(error);
     }
+    //return curr_game;
 
   }, [wallet]);
 
@@ -74,6 +76,7 @@ function Board() {
         {/* setStatus(2);
         await submit(); */}
         setStatus(0);
+        setCurrGame("");
       } 
       console.log(response);
     } catch (error) {
@@ -119,7 +122,16 @@ function Board() {
 
   return (
     <div>
-      {curr_game != "notyet" && (
+      {game_status == 0 && <p>Start the game now!</p>}
+      {game_status == 1 && <p>End the game fast!</p>}
+      {/* {game_status == 1 && <p>Submit game to leaderboard?</p>}*/}
+      <button className="start" onClick={start}>
+        Start
+      </button>
+      <button className="end" onClick={end}>
+        End
+      </button>
+      {curr_game != "" && (
         <SuccessMessage reset={reset}>
           <a 
             href={`https://explorer.sui.io/objects/${curr_game}?network=mainnet`}
@@ -131,15 +143,6 @@ function Board() {
           </a>
         </SuccessMessage>
       )}
-      {game_status == 0 && <p>Start the game now!</p>}
-      {game_status == 1 && <p>End the game fast!</p>}
-      {/* {game_status == 1 && <p>Submit game to leaderboard?</p>}*/}
-      <button className="start" onClick={start}>
-        Start
-      </button>
-      <button className="end" onClick={end}>
-        End
-      </button>
     </div>
   );
 }
