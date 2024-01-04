@@ -5,12 +5,12 @@ module suizzle_sprint::leaderboard {
     use sui::tx_context::{TxContext};
     use sui::transfer;
 
-    use suizzle_sprint::suizzle_sprint::{Self, SprintGame};
+    use suizzle_sprint::sprint_game::{Self, SprintGame};
 
     const ENotALeader: u64 = 0;
     const EOffTheCharts: u64 = 1;
 
-    struct Leaderboard has key, store {
+    struct SprintLeaderboard has key, store {
         id: UID,
         max_leaderboard_game_count: u64,
         top_games: vector<TopSprintGame>,
@@ -43,18 +43,18 @@ module suizzle_sprint::leaderboard {
 
     public entry fun submit_game(game: &mut SprintGame, leaderboard: &mut SprintLeaderboard) {
 
-        let duration = *suizzle_sprint::duration(game);
+        let duration = *sprint_game::duration(game);
 
         assert!(duration <= leaderboard.max_duration, EOffTheCharts);
 
-        let leader_address = *suizzle_sprint::player(game);
-        let game_id = suizzle_sprint::id(game);
+        let leader_address = *sprint_game::player(game);
+        let game_id = sprint_game::id(game);
 
         let top_game = TopSprintGame {
             game_id,
             leader_address,
-            start_time: *suizzle_sprint::start_time(game),
-            duration: *suizzle_sprint::duration(game),
+            start_time: *sprint_game::start_time(game),
+            duration: *sprint_game::duration(game),
 
         };
 
@@ -84,14 +84,9 @@ module suizzle_sprint::leaderboard {
         top_game.game_id
     }
 
-    public fun top_game_top_tile(top_game: &TopSprintGame): &u64 {
-        &top_game.top_tile
+    public fun top_game_duration(top_game: &TopSprintGame): &u64 {
+        &top_game.duration
     }
-
-    public fun top_game_score(top_game: &TopSprintGame): &u64 {
-        &top_game.score
-    }
-
     public fun max_duration(leaderboard: &SprintLeaderboard): &u64 {
         &leaderboard.max_duration
     }
@@ -157,12 +152,12 @@ module suizzle_sprint::leaderboard {
             let left_item = vector::borrow(&left, vector::length(&left) - 1);
             let right_item = vector::borrow(&right, vector::length(&right) - 1);
 
-            if (left_item.top_tile > right_item.top_tile) {
+            if (left_item.duration < right_item.duration) {
                 vector::push_back(&mut result, vector::pop_back(&mut left));
-            } else if (left_item.top_tile < right_item.top_tile) {
+            } else if (left_item.duration > right_item.duration) {
                 vector::push_back(&mut result, vector::pop_back(&mut right));
             } else {
-                if (left_item.score > right_item.score) {
+                if (left_item.duration < right_item.duration) {
                     vector::push_back(&mut result, vector::pop_back(&mut left));
                 } else {
                     vector::push_back(&mut result, vector::pop_back(&mut right));

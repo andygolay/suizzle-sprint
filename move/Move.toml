@@ -1,9 +1,10 @@
 [package]
 name = "Suizzle Sprint"
 version = "0.0.1"
+published-at = "0x8e59dd7a774b5f4eef4f3f1ce26375700ad4b59c234bedd72a78094e695fb8dc"
 
 [dependencies]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir="crates/sui-framework/packages/sui-framework", rev="mainnet" }
 
 [addresses]
-suizzle_sprint = "0x0"
+suizzle_sprint = "0x0"#"0x8e59dd7a774b5f4eef4f3f1ce26375700ad4b59c234bedd72a78094e695fb8dc"
