@@ -6,7 +6,7 @@
 
 `0xdddd53a9719c5c4f593e55261093cd410baeb26935273accc769e1e40e824cd5`
 
-(contains game module and leaderboard module)
+(contains `sprint_game` and `leaderboard` modules)
 
 ### Leaderboard object ID:
 
