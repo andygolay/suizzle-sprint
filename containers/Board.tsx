@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import SuccessMessage from "../components/SuccessMessage";
-import { SPRINT_GAME_CONTRACT, LEADERBOARD_CONTRACT } from '../lib/constants';
+import { SPRINT_GAME_CONTRACT, LEADERBOARD_OBJECT } from '../lib/constants';
 import { ethos, TransactionBlock } from 'ethos-connect'
 
 function Board() {
@@ -18,7 +18,7 @@ function Board() {
     try {
       const startTx = new TransactionBlock();
       const createdGame = startTx.moveCall({
-        target: `${SPRINT_GAME_CONTRACT}::suizzle_sprint::create_game`,
+        target: `${SPRINT_GAME_CONTRACT}::sprint_game::create_game`,
         arguments: [
           startTx.pure("0x6"),        
         ]
@@ -55,7 +55,7 @@ function Board() {
     try {
       const endTx = new TransactionBlock();
       const endedGame = endTx.moveCall({
-        target: `${SPRINT_GAME_CONTRACT}::suizzle_sprint::end_game`,
+        target: `${SPRINT_GAME_CONTRACT}::sprint_game::end_game`,
         arguments: [
           endTx.pure("0x6"),  
           endTx.pure(curr_game)      
@@ -93,7 +93,7 @@ function Board() {
         target: `${SPRINT_GAME_CONTRACT}::leaderboard::submit_game`,
         arguments: [
           submitTx.pure(curr_game),  
-          submitTx.pure(LEADERBOARD_CONTRACT)      
+          submitTx.pure(LEADERBOARD_OBJECT)    
         ]
       })
 
